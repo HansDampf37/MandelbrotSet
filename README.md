@@ -17,7 +17,7 @@ sudo dnf install mesa-libGL-devel glfw-devel glew-devel
 
 # How to run
 1. Clone the repository
-2. install the dependencies
+2. Install the dependencies
 3. Run the following commands:
     ```bash
     mkdir cmake-build-debug
@@ -26,7 +26,7 @@ sudo dnf install mesa-libGL-devel glfw-devel glew-devel
     make
     ./mandelbrot
     ```
-4. You can control the camera using W, A, S, D, Shift, and Space.
+4. You can control the camera using W, A, S, D, Shift, and Space
 
 # Limitations
 - This program reaches numerical limits when zooming in too far. This is due to the limited precision of numbers in computers.
