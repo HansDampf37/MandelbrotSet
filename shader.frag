@@ -7,7 +7,7 @@ uniform vec2 u_center;
 uniform float u_zoom;
 uniform vec2 u_julia;
 
-vec2 mapCorner2 = vec2(-0.5, -0.5);
+vec2 mapCorner2 = vec2(-0.4, -0.4);
 vec2 mapCorner1 = vec2(-1.0, -1.0);
 vec2 mapCenter = (mapCorner1 + mapCorner2) / 2;
 float mapBorderSize = 0.001;
@@ -64,8 +64,20 @@ void main() {
         // draw mandelbrot map
         vec2 fragCoordBottomLeft = (fragCoord - mapCenter) * 4;
         vec2 complexNumber = fragCoordBottomLeft + u_julia;
-        int iters = mandelbrotIterations(complexNumber);
-        vec4 color = iterToColor(iters);
+
+        // use 4 points to prevent aliasing
+        vec2 c1 = complexNumber + 0.25 * vec2(4 / u_resolution.x, 4 / u_resolution.y);
+        vec2 c2 = complexNumber - 0.25 * vec2(4 / u_resolution.x, 4 / u_resolution.y);
+        vec2 c3 = complexNumber + 0.25 * vec2(4 / u_resolution.x, -4 / u_resolution.y);
+        vec2 c4 = complexNumber - 0.25 * vec2(4 / u_resolution.x, -4 / u_resolution.y);
+
+        int iters1 = mandelbrotIterations(c1);
+        int iters2 = mandelbrotIterations(c2);
+        int iters3 = mandelbrotIterations(c3);
+        int iters4 = mandelbrotIterations(c4);
+
+        // average the colors
+        vec4 color = 0.25 * (iterToColor2(iters1) + iterToColor2(iters2) + iterToColor2(iters3) + iterToColor2(iters4));
         FragColor = color;
     } else if (fragCoord.x < mapCorner2.x + mapBorderSize && fragCoord.y < mapCorner2.y + mapBorderSize) {
         // draw map border
