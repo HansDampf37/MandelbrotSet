@@ -3,6 +3,8 @@ This is a simple project to render the [Mandelbrot Set](https://en.wikipedia.org
 TLDR: The Mandelbrot set is the set of complex numbers c for which the function f(z) = z^2 + c does not diverge when iterated from z = 0.
 Coloring is done using the number of iterations it takes for the function to 'diverge'.
 
+![images/image_for_readme.png](images/image_for_readme.png)
+
 # Dependencies
 - OpenGL
 - GLEW
