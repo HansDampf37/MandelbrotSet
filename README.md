@@ -2,12 +2,14 @@
 This is a simple project to render [Julia Sets](https://en.wikipedia.org/wiki/Julia_set) and the [Mandelbrot Set](https://en.wikipedia.org/wiki/Mandelbrot_set) using the GPU.
 ## Mandelbrot Set
 The Mandelbrot set is the set of complex numbers $c$ for which the function $f_i(c)$ does not diverge when iterated from $f_0(c) = 0$.
+
 $$
 \begin{align}
 f_0(c) &= 0 \\
 f_i(c) &= f_{i-1}(c)^2 + c
 \end{align}
 $$
+
 Coloring is done using the number of iterations it takes for the function to 'diverge'.
 
 ![images/image_for_readme.png](images/image_for_readme.png)
