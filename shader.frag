@@ -5,6 +5,7 @@ in vec2 fragCoord;
 uniform vec2 u_resolution;
 uniform vec2 u_center;
 uniform float u_zoom;
+uniform float u_max_iterations;
 uniform vec2 u_julia;
 
 vec2 mapCorner2 = vec2(-0.4, -0.4);
@@ -15,7 +16,7 @@ float mapBorderSize = 0.001;
 int mandelbrotIterations(vec2 c) {
     vec2 z = vec2(0.0);
     int i;
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < u_max_iterations; i++) {
         // if z^2 + c diverges, break
         if (dot(z, z) > 40.0) break;
         // calculate next iteration
@@ -27,7 +28,7 @@ int mandelbrotIterations(vec2 c) {
 int julaIterations(vec2 c, vec2 julia) {
     vec2 z = c;
     int i;
-    for (i = 0; i < 256; i++) {
+    for (i = 0; i < u_max_iterations; i++) {
         // if z^2 + c diverges, break
         if (dot(z, z) > 40.0) break;
         // calculate next iteration
@@ -41,14 +42,14 @@ vec2 fragCoordToComplexJulia(vec2 fragCoord) {
 }
 
 vec4 iterToColor(int iters) {
-    if (iters == 256) return vec4(0.0, 0.0, 0.0, 1.0);
-    float t = float(iters) / 256.0;
+    if (iters == u_max_iterations) return vec4(0.0, 0.0, 0.0, 1.0);
+    float t = float(iters) / u_max_iterations;
     return vec4(t, t, sqrt(t), 1.0);
 }
 
 vec4 iterToColor2(int iters) {
-    if (iters == 256) return vec4(0.0, 0.0, 0.0, 1.0);
-    float t = float(iters) / 256.0;
+    if (iters == u_max_iterations) return vec4(0.0, 0.0, 0.0, 1.0);
+    float t = float(iters) / u_max_iterations;
     return vec4(0.6*t, 4 * (t - 1) * -t, sqrt(t), 1.0);
 }
 
@@ -77,7 +78,7 @@ void main() {
         int iters4 = mandelbrotIterations(c4);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColor2(iters1) + iterToColor2(iters2) + iterToColor2(iters3) + iterToColor2(iters4));
+        vec4 color = 0.25 * (iterToColor(iters1) + iterToColor(iters2) + iterToColor(iters3) + iterToColor(iters4));
         FragColor = color;
     } else if (fragCoord.x < mapCorner2.x + mapBorderSize && fragCoord.y < mapCorner2.y + mapBorderSize) {
         // draw map border

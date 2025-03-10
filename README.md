@@ -50,8 +50,9 @@ sudo dnf install mesa-libGL-devel glfw-devel glew-devel
     make
     ./mandelbrot
     ```
-4. You can control the camera using W, A, S, D, Shift, and Space
+4. You can control the camera using `W`, `A`, `S`, `D`, `Shift`, and `Space`
 5. You can change the real and imaginary parts of the julia sets parameter $j$ using the arrow keys
+6. You can change the threshold for when a point is considered to have diverged using the `F` and `G` keys
 
 # Limitations
 - This program reaches numerical limits when zooming in too far. This is due to the limited precision of numbers in computers.

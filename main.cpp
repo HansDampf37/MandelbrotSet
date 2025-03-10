@@ -45,6 +45,8 @@ float zoom = 1.0f;
 float julia_real = -0.8f;
 float julia_imag = 0.156f;
 
+float maxIterations = 256.0f;
+
 std::map<int, bool> keysPressed = {};
 
 
@@ -90,6 +92,12 @@ void getInputs() {
     if (keysPressed[GLFW_KEY_RIGHT]) {
         julia_real += julia_speed;
     }
+    if (keysPressed[GLFW_KEY_F]) {
+        maxIterations += 10;
+    }
+    if (keysPressed[GLFW_KEY_G]) {
+        maxIterations -= 10;
+    }
 }
 
 int main() {
@@ -130,6 +138,7 @@ int main() {
     const GLint centerLoc = glGetUniformLocation(shaderProgram, "u_center");
     const GLint zoomLoc = glGetUniformLocation(shaderProgram, "u_zoom");
     const GLint juliaLoc = glGetUniformLocation(shaderProgram, "u_julia");
+    const GLint maxIterLoc = glGetUniformLocation(shaderProgram, "u_max_iterations");
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -139,6 +148,7 @@ int main() {
         glUniform2f(resLoc, static_cast<float>(width), static_cast<float>(height));
         glUniform2f(centerLoc, center_x, center_y);
         glUniform2f(juliaLoc, julia_real, julia_imag);
+        glUniform1f(maxIterLoc, maxIterations);
         glUniform1f(zoomLoc, zoom);
 
         getInputs();
