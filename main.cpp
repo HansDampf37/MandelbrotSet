@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <sstream>
 
 GLuint LoadShader(const char *path, GLenum type) {
@@ -41,36 +42,55 @@ float center_x = -0.75f;
 float center_y = 0.0f;
 float zoom = 1.0f;
 
+float julia_real = -0.8f;
+float julia_imag = 0.156f;
+
+std::map<int, bool> keysPressed = {};
+
 
 void keyCallback(GLFWwindow *, const int key, int, const int action, int) {
-    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-        constexpr float zoomSpeed = 1.1f;
-        constexpr float moveSpeed = 0.07f;
-        switch (key) {
-            case GLFW_KEY_W:
-                center_y += moveSpeed * zoom;
-                break;
-            case GLFW_KEY_S:
-                center_y -= moveSpeed * zoom;
-                break;
-            case GLFW_KEY_A:
-                center_x -= moveSpeed * zoom;
-                break;
-            case GLFW_KEY_D:
-                center_x += moveSpeed * zoom;
-                break;
-            case GLFW_KEY_LEFT_SHIFT:
-                zoom *= zoomSpeed;
-                break;
-            case GLFW_KEY_SPACE:
-                zoom /= zoomSpeed;
-                break;
-            default:
-                break;
-        }
+    if (action == GLFW_PRESS) {
+        keysPressed[key] = true;
+    } else if (action == GLFW_RELEASE) {
+        keysPressed[key] = false;
     }
 }
 
+void getInputs() {
+    constexpr float moveSpeed = 0.035f;
+    constexpr float zoomSpeed = 1.05f;
+    constexpr float julia_speed = 0.0003f;
+    if (keysPressed[GLFW_KEY_W]) {
+        center_y += moveSpeed * zoom;
+    }
+    if (keysPressed[GLFW_KEY_S]) {
+        center_y -= moveSpeed * zoom;
+    }
+    if (keysPressed[GLFW_KEY_A]) {
+        center_x -= moveSpeed * zoom;
+    }
+    if (keysPressed[GLFW_KEY_D]) {
+        center_x += moveSpeed * zoom;
+    }
+    if (keysPressed[GLFW_KEY_LEFT_SHIFT]) {
+        zoom *= zoomSpeed;
+    }
+    if (keysPressed[GLFW_KEY_SPACE]) {
+        zoom /= zoomSpeed;
+    }
+    if (keysPressed[GLFW_KEY_UP]) {
+        julia_imag += julia_speed;
+    }
+    if (keysPressed[GLFW_KEY_DOWN]) {
+        julia_imag -= julia_speed;
+    }
+    if (keysPressed[GLFW_KEY_LEFT]) {
+        julia_real -= julia_speed;
+    }
+    if (keysPressed[GLFW_KEY_RIGHT]) {
+        julia_real += julia_speed;
+    }
+}
 
 int main() {
     if (!glfwInit()) return -1;
@@ -109,6 +129,7 @@ int main() {
     const GLint resLoc = glGetUniformLocation(shaderProgram, "u_resolution");
     const GLint centerLoc = glGetUniformLocation(shaderProgram, "u_center");
     const GLint zoomLoc = glGetUniformLocation(shaderProgram, "u_zoom");
+    const GLint juliaLoc = glGetUniformLocation(shaderProgram, "u_julia");
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -117,7 +138,10 @@ int main() {
         glfwGetFramebufferSize(window, &width, &height);
         glUniform2f(resLoc, static_cast<float>(width), static_cast<float>(height));
         glUniform2f(centerLoc, center_x, center_y);
+        glUniform2f(juliaLoc, julia_real, julia_imag);
         glUniform1f(zoomLoc, zoom);
+
+        getInputs();
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
