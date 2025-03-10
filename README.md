@@ -20,7 +20,8 @@ sudo dnf install mesa-libGL-devel glfw-devel glew-devel
 2. install the dependencies
 3. Run the following commands:
 ```bash
-cd build
+mkdir cmake-build-debug
+cd cmake-build-debug
 cmake ..
 make
 ./mandelbrot
