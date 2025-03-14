@@ -8,10 +8,24 @@ uniform float u_zoom;
 uniform float u_max_iterations;
 uniform vec2 u_julia;
 
-vec2 mapCorner2 = vec2(-0.4, -0.4);
-vec2 mapCorner1 = vec2(-1.0, -1.0);
-vec2 mapCenter = (mapCorner1 + mapCorner2) / 2;
-float mapBorderSize = 0.001;
+const vec2 mapCorner2 = vec2(-0.4, -0.4);
+const vec2 mapCorner1 = vec2(-1.0, -1.0);
+const vec2 mapCenter = (mapCorner1 + mapCorner2) / 2;
+const float mapBorderSize = 0.001;
+
+// Define the color control points
+const vec3 color0 = vec3(0, 7, 100) / 255.0;
+const vec3 color1 = vec3(32, 107, 203) / 255.0;
+const vec3 color2 = vec3(237, 255, 255) / 255.0;
+const vec3 color3 = vec3(255, 170, 0) / 255.0;
+const vec3 color4 = vec3(0, 2, 0) / 255.0;
+
+// Define the positions of the control points
+const float pos0 = 0.0;
+const float pos1 = 0.16;
+const float pos2 = 0.42;
+const float pos3 = 0.6425;
+const float pos4 = 0.8575;
 
 int mandelbrotIterations(vec2 c) {
     vec2 z = vec2(0.0);
@@ -53,6 +67,30 @@ vec4 iterToColor2(int iters) {
     return vec4(0.6*t, 4 * (t - 1) * -t, sqrt(t), 1.0);
 }
 
+vec4 iterToColor3(int iters) {
+    if (iters == u_max_iterations) return vec4(0.0, 0.0, 0.0, 1.0); // Inside the Mandelbrot set
+    float t = float(iters) / float(u_max_iterations); // Normalize iteration count to [0, 1]
+
+    // Perform linear interpolation based on the value of t
+    if (t <= pos0) {
+        return vec4(color0, 1.0);
+    } else if (t <= pos1) {
+        float u = (t - pos0) / (pos1 - pos0);
+        return vec4(mix(color0, color1, u), 1.0);
+    } else if (t <= pos2) {
+        float u = (t - pos1) / (pos2 - pos1);
+        return vec4(mix(color1, color2, u), 1.0);
+    } else if (t <= pos3) {
+        float u = (t - pos2) / (pos3 - pos2);
+        return vec4(mix(color2, color3, u), 1.0);
+    } else if (t <= pos4) {
+        float u = (t - pos3) / (pos4 - pos3);
+        return vec4(mix(color3, color4, u), 1.0);
+    } else {
+        return vec4(color4, 1.0);
+    }
+}
+
 void main() {
     if (fragCoord.x < mapCorner2.x && fragCoord.y < mapCorner2.y) {
         // draw center
@@ -78,7 +116,7 @@ void main() {
         int iters4 = mandelbrotIterations(c4);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColor(iters1) + iterToColor(iters2) + iterToColor(iters3) + iterToColor(iters4));
+        vec4 color = 0.25 * (iterToColor3(iters1) + iterToColor3(iters2) + iterToColor3(iters3) + iterToColor3(iters4));
         FragColor = color;
     } else if (fragCoord.x < mapCorner2.x + mapBorderSize && fragCoord.y < mapCorner2.y + mapBorderSize) {
         // draw map border
@@ -97,7 +135,7 @@ void main() {
         int iters4 = julaIterations(c4, u_julia);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColor2(iters1) + iterToColor2(iters2) + iterToColor2(iters3) + iterToColor2(iters4));
+        vec4 color = 0.25 * (iterToColor3(iters1) + iterToColor3(iters2) + iterToColor3(iters3) + iterToColor3(iters4));
         FragColor = color;
     }
 }
