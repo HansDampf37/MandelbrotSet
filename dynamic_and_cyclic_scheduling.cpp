@@ -7,6 +7,10 @@
 #include <complex>
 #include <chrono>
 
+constexpr double centerX = -0.75;
+constexpr double zoom = 1.5;
+constexpr double centerY = 0.0;
+
 struct Params {
     int width;
     int height;
@@ -19,7 +23,7 @@ struct Params {
 };
 
 int mandelbrot(const std::complex<double> c, const int maxIterations) {
-    std::complex<double> z = 0;
+    auto z = std::complex<double>{0, 0};
     int iterations = 0;
     while (std::abs(z) <= 2.0 && iterations < maxIterations) {
         z = z * z + c;
@@ -71,7 +75,7 @@ void worker(const int thread_id,
         }
     } else {
         // Cyclic scheduling
-        for (int row = thread_id; row < params.height; row += params.numThreads) {
+        for (u_int row = thread_id; row < params.height; row += params.numThreads) {
             for (int x = 0; x < params.width; ++x) {
                 const double fragX = 2.0 * x / (params.width - 1) - 1.0;
                 const double fragY = 2.0 * row / (params.height - 1) - 1.0;
@@ -123,7 +127,7 @@ double run_and_time(const Params &params) {
     }
 
     const auto end_time = std::chrono::steady_clock::now();
-    if (tasks) delete tasks;
+    delete tasks;
 
     const std::chrono::duration<double> elapsed_seconds = end_time - start_time;
 
@@ -134,10 +138,6 @@ double run_and_time(const Params &params) {
 }
 
 int main() {
-    constexpr double centerX = -0.75;
-    constexpr double centerY = 0.0;
-    constexpr double zoom = 1.5;
-
     const std::vector widths = {400, 800, 2880};
     const std::vector heights = {400, 800, 1920};
     const std::vector maxIters = {500, 1000, 2000};
@@ -160,7 +160,7 @@ int main() {
                     params.zoom = zoom;
                     params.maxIterations = maxIter;
                     params.numThreads = numThreads;
-                    params.useDynamicScheduling = useDynamic;;
+                    params.useDynamicScheduling = useDynamic;
 
                     const double elapsed = run_and_time(params);
 
@@ -169,8 +169,6 @@ int main() {
             }
         }
     }
-
-
 
     return 0;
 }

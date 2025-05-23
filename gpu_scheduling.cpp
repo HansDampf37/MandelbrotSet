@@ -1,3 +1,4 @@
+#include <chrono>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -43,20 +44,21 @@ GLuint LoadShader(const char *path, GLenum type) {
 // float center_y = 0.1f;
 // float zoom = 0.01f;
 
-// normal section
-// float center_x = -0.75f;
-// float center_y = 0.0f;
-// float zoom = 1.5f;
+// some set pixels
+float center_x = -0.75f;
+float center_y = 0.0f;
+float zoom = 1.5f;
 
 // many set pixels
-float center_x = -0.25f;
-float center_y = 0.0f;
-float zoom = 0.5f;
+// float center_x = -0.25f;
+// float center_y = 0.0f;
+// float zoom = 0.5f;
 
 float julia_real = -0.8f;
 float julia_imag = 0.156f;
 
 float maxIterations = 100.0f;
+int resolution = 2000;
 
 std::map<int, bool> keysPressed = {};
 
@@ -109,6 +111,13 @@ void getInputs() {
     if (keysPressed[GLFW_KEY_G]) {
         maxIterations -= 50;
     }
+    if (keysPressed[GLFW_KEY_R]) {
+        resolution += 10;
+        if (resolution > 4000) resolution = 4000;
+    }
+    if (keysPressed[GLFW_KEY_T]) {
+        resolution -= 10;
+    }
 }
 
 int main() {
@@ -152,11 +161,10 @@ int main() {
     const GLint maxIterLoc = glGetUniformLocation(shaderProgram, "u_max_iterations");
 
     while (!glfwWindowShouldClose(window)) {
-        double lastFrame = glfwGetTime();
         glClear(GL_COLOR_BUFFER_BIT);
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        const int width = resolution;
+        const int height = resolution;
         glUniform2f(resLoc, static_cast<float>(width), static_cast<float>(height));
         glUniform2f(centerLoc, center_x, center_y);
         glUniform2f(juliaLoc, julia_real, julia_imag);
@@ -170,14 +178,6 @@ int main() {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-        const double currentFrame = glfwGetTime();
-        const double deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-        //std::cout << "Dimensions: " << width << "x" << height <<
-        //    ", Duration: " << deltaTime * 1000.0 << "ms" <<
-        //        ", Max Iterations: " << maxIterations << std::endl;
-        std::cout << "(" << maxIterations << ", " << deltaTime * 1000.0 << ")," << std::endl;
     }
 
     glDeleteShader(vertShader);
