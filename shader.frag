@@ -8,8 +8,8 @@ uniform float u_zoom;
 uniform float u_max_iterations;
 uniform vec2 u_julia;
 
-const vec2 mapCorner2 = vec2(-10.4, -10.4);
-const vec2 mapCorner1 = vec2(-1.1, -1.1);
+const vec2 mapCorner2 = vec2(-0.4, -0.4);
+const vec2 mapCorner1 = vec2(-1.0, -1.0);
 const vec2 mapCenter = (mapCorner1 + mapCorner2) / 2;
 const float mapBorderSize = 0.001;
 
@@ -132,7 +132,7 @@ void main() {
         int iters4 = mandelbrotIterations(c4);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColor2(iters1) + iterToColor2(iters2) + iterToColor2(iters3) + iterToColor2(iters4));
+        vec4 color = 0.25 * (iterToColor3(iters1) + iterToColor3(iters2) + iterToColor3(iters3) + iterToColor3(iters4));
         FragColor = color;
     } else if (fragCoord.x < mapCorner2.x + mapBorderSize && fragCoord.y < mapCorner2.y + mapBorderSize) {
         // draw map border
@@ -145,13 +145,13 @@ void main() {
         vec2 c3 = complexNumber + 0.25 * u_zoom * vec2(1 / u_resolution.x, -1/ u_resolution.y);
         vec2 c4 = complexNumber - 0.25 * u_zoom * vec2(1 / u_resolution.x, -1/ u_resolution.y);
 
-        int iters1 = mandelbrotIterations(c1);
-        int iters2 = mandelbrotIterations(c2);
-        int iters3 = mandelbrotIterations(c3);
-        int iters4 = mandelbrotIterations(c4);
+        int iters1 = julaIterations(c1, u_julia);
+        int iters2 = julaIterations(c2, u_julia);
+        int iters3 = julaIterations(c3, u_julia);
+        int iters4 = julaIterations(c4, u_julia);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColorBlackWhite(iters1) + iterToColorBlackWhite(iters2) + iterToColorBlackWhite(iters3) + iterToColorBlackWhite(iters4));
+        vec4 color = 0.25 * (iterToColor3(iters1) + iterToColor3(iters2) + iterToColor3(iters3) + iterToColor3(iters4));
         FragColor = color;
     }
 }
