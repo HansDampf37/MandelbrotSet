@@ -8,8 +8,8 @@ uniform float u_zoom;
 uniform float u_max_iterations;
 uniform vec2 u_julia;
 
-const vec2 mapCorner2 = vec2(-0.4, -0.4);
-const vec2 mapCorner1 = vec2(-1.0, -1.0);
+const vec2 mapCorner2 = vec2(-10.4, -10.4);
+const vec2 mapCorner1 = vec2(-1.1, -1.1);
 const vec2 mapCenter = (mapCorner1 + mapCorner2) / 2;
 const float mapBorderSize = 0.001;
 
@@ -27,6 +27,10 @@ const float pos2 = 0.42;
 const float pos3 = 0.6425;
 const float pos4 = 0.8575;
 
+/**
+ * Function to calculate the number of iterations until a point diverges under the mandelbrot formula.
+ * Maximum is u_max_iterations.
+ **/
 int mandelbrotIterations(vec2 c) {
     vec2 z = vec2(0.0);
     int i;
@@ -39,6 +43,10 @@ int mandelbrotIterations(vec2 c) {
     return i;
 }
 
+/**
+ * Function to calculate the number of iterations until a point diverges under the julia formula.
+ * Maximum is u_max_iterations.
+ **/
 int julaIterations(vec2 c, vec2 julia) {
     vec2 z = c;
     int i;
@@ -51,7 +59,10 @@ int julaIterations(vec2 c, vec2 julia) {
     return i;
 }
 
-vec2 fragCoordToComplexJulia(vec2 fragCoord) {
+/**
+ * Given a fragment coordinate, convert it to a complex number.
+ **/
+vec2 fragCoordToComplex(vec2 fragCoord) {
     return fragCoord * u_zoom + u_center;
 }
 
@@ -91,6 +102,11 @@ vec4 iterToColor3(int iters) {
     }
 }
 
+vec4 iterToColorBlackWhite(int iters) {
+    if (iters == u_max_iterations) return vec4(0.8, 0.1, 0.1, 1.0); // Inside the Mandelbrot set
+    else return vec4(0.0, 1.0, 1.0, 1.0); // Outside the Mandelbrot set
+}
+
 void main() {
     if (fragCoord.x < mapCorner2.x && fragCoord.y < mapCorner2.y) {
         // draw center
@@ -116,26 +132,26 @@ void main() {
         int iters4 = mandelbrotIterations(c4);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColor3(iters1) + iterToColor3(iters2) + iterToColor3(iters3) + iterToColor3(iters4));
+        vec4 color = 0.25 * (iterToColor2(iters1) + iterToColor2(iters2) + iterToColor2(iters3) + iterToColor2(iters4));
         FragColor = color;
     } else if (fragCoord.x < mapCorner2.x + mapBorderSize && fragCoord.y < mapCorner2.y + mapBorderSize) {
         // draw map border
         FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     } else {
-        vec2 complexNumber = fragCoordToComplexJulia(fragCoord);
+        vec2 complexNumber = fragCoordToComplex(fragCoord);
         // use 4 points to prevent aliasing
         vec2 c1 = complexNumber + 0.25 * u_zoom * vec2(1 / u_resolution.x, 1/ u_resolution.y);
         vec2 c2 = complexNumber - 0.25 * u_zoom * vec2(1 / u_resolution.x, 1/ u_resolution.y);
         vec2 c3 = complexNumber + 0.25 * u_zoom * vec2(1 / u_resolution.x, -1/ u_resolution.y);
         vec2 c4 = complexNumber - 0.25 * u_zoom * vec2(1 / u_resolution.x, -1/ u_resolution.y);
 
-        int iters1 = julaIterations(c1, u_julia);
-        int iters2 = julaIterations(c2, u_julia);
-        int iters3 = julaIterations(c3, u_julia);
-        int iters4 = julaIterations(c4, u_julia);
+        int iters1 = mandelbrotIterations(c1);
+        int iters2 = mandelbrotIterations(c2);
+        int iters3 = mandelbrotIterations(c3);
+        int iters4 = mandelbrotIterations(c4);
 
         // average the colors
-        vec4 color = 0.25 * (iterToColor3(iters1) + iterToColor3(iters2) + iterToColor3(iters3) + iterToColor3(iters4));
+        vec4 color = 0.25 * (iterToColorBlackWhite(iters1) + iterToColorBlackWhite(iters2) + iterToColorBlackWhite(iters3) + iterToColorBlackWhite(iters4));
         FragColor = color;
     }
 }

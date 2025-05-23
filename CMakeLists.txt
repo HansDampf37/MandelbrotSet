@@ -12,7 +12,7 @@ pkg_check_modules(GLFW REQUIRED glfw3)
 pkg_check_modules(GLEW REQUIRED glew)
 
 # Add the executable
-add_executable(mandelbrot main.cpp)
+add_executable(mandelbrot gpu_scheduling.cpp)
 
 # Link libraries
 target_include_directories(mandelbrot PRIVATE ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})

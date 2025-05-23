@@ -38,14 +38,25 @@ GLuint LoadShader(const char *path, GLenum type) {
 }
 
 // initial camera values
-float center_x = -0.75f;
+// few set pixels
+// float center_x = -0.754f;
+// float center_y = 0.1f;
+// float zoom = 0.01f;
+
+// normal section
+// float center_x = -0.75f;
+// float center_y = 0.0f;
+// float zoom = 1.5f;
+
+// many set pixels
+float center_x = -0.25f;
 float center_y = 0.0f;
-float zoom = 1.0f;
+float zoom = 0.5f;
 
 float julia_real = -0.8f;
 float julia_imag = 0.156f;
 
-float maxIterations = 256.0f;
+float maxIterations = 100.0f;
 
 std::map<int, bool> keysPressed = {};
 
@@ -93,10 +104,10 @@ void getInputs() {
         julia_real += julia_speed;
     }
     if (keysPressed[GLFW_KEY_F]) {
-        maxIterations += 10;
+        maxIterations += 50;
     }
     if (keysPressed[GLFW_KEY_G]) {
-        maxIterations -= 10;
+        maxIterations -= 50;
     }
 }
 
@@ -141,6 +152,7 @@ int main() {
     const GLint maxIterLoc = glGetUniformLocation(shaderProgram, "u_max_iterations");
 
     while (!glfwWindowShouldClose(window)) {
+        double lastFrame = glfwGetTime();
         glClear(GL_COLOR_BUFFER_BIT);
 
         int width, height;
@@ -158,6 +170,14 @@ int main() {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        const double currentFrame = glfwGetTime();
+        const double deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        //std::cout << "Dimensions: " << width << "x" << height <<
+        //    ", Duration: " << deltaTime * 1000.0 << "ms" <<
+        //        ", Max Iterations: " << maxIterations << std::endl;
+        std::cout << "(" << maxIterations << ", " << deltaTime * 1000.0 << ")," << std::endl;
     }
 
     glDeleteShader(vertShader);
